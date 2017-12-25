@@ -1,4 +1,5 @@
 #include "UdpLog.h"
+#include "singleJson.hpp"
 #include "json.h"
 
 std::mutex * UdpLog::_mt=new std::mutex;
@@ -163,69 +164,65 @@ void UdpLog::resetDst(const char *ip, int port, int logId){
 }
 
 void UdpLog::i(const char *tag, const char *msg){
-	Json::Value root;
+	SingleJson sj;
 	if (tag == NULL){
 		char buf[4];
 		sprintf(buf, "%d", _logId);
-		root["tag"] = buf;
+		sj._strings["tag"] = buf;
 	}else
-		root["tag"] = tag;
-	root["time"] = time(NULL);
-	root["level"] = "i";
-	root["msg"] = msg;
-	std::string str = root.toStyledString();
-	str[str.length() - 1] = '\0';
+		sj._strings["tag"] = tag;
+	sj._ints["time"] = time(NULL);
+	sj._strings["level"] = "i";
+	sj._strings["msg"] = msg;
+	std::string str = sj.stringify();
 	sendMsg(str.c_str());
 }
 
 void UdpLog::d(const char *tag, const char *msg){
-	Json::Value root;
+	SingleJson sj;
 	if (tag == NULL){
 		char buf[4];
 		sprintf(buf, "%d", _logId);
-		root["tag"] = buf;
+		sj._strings["tag"] = buf;
 	}
 	else
-		root["tag"] = tag;
-	root["time"] = time(NULL);
-	root["level"] = "d";
-	root["msg"] = msg;
-	std::string str = root.toStyledString();
-	str[str.length() - 1] = '\0';
+		sj._strings["tag"] = tag;
+	sj._ints["time"] = time(NULL);
+	sj._strings["level"] = "d";
+	sj._strings["msg"] = msg;
+	std::string str = sj.stringify();
 	sendMsg(str.c_str());
 }
 
 void UdpLog::e(const char *tag, const char *msg){
-	Json::Value root;
+	SingleJson sj;
 	if (tag == NULL){
 		char buf[4];
 		sprintf(buf, "%d", _logId);
-		root["tag"] = buf;
+		sj._strings["tag"] = buf;
 	}
 	else
-		root["tag"] = tag;
-	root["time"] = time(NULL);
-	root["level"] = "e";
-	root["msg"] = msg;
-	std::string str = root.toStyledString();
-	str[str.length() - 1] = '\0';
+		sj._strings["tag"] = tag;
+	sj._ints["time"] = time(NULL);
+	sj._strings["level"] = "e";
+	sj._strings["msg"] = msg;
+	std::string str = sj.stringify();
 	sendMsg(str.c_str());
 }
 
 void UdpLog::w(const char *tag, const char *msg) {
-	Json::Value root;
+	SingleJson sj;
 	if (tag == NULL){
 		char buf[4];
 		sprintf(buf, "%d", _logId);
-		root["tag"] = buf;
+		sj._strings["tag"] = buf;
 	}
 	else
-		root["tag"] = tag;
-	root["time"] = time(NULL);
-	root["level"] = "w";
-	root["msg"] = msg;
-	std::string str = root.toStyledString();
-	str[str.length() - 1] = '\0';
+		sj._strings["tag"] = tag;
+	sj._ints["time"] = time(NULL);
+	sj._strings["level"] = "w";
+	sj._strings["msg"] = msg;
+	std::string str = sj.stringify();
 	sendMsg(str.c_str());
 }
 

@@ -9,39 +9,47 @@ struct SingleJson{
 	map<string, string> _strings;
 	map<string, float> _floats;
 	map<string, bool> _bools;
-	const char *stringify(){
+	string stringify(){
 		string jsonTxt = "{";
 		map<string, int>::iterator iterInt;
 		iterInt = _ints.begin();
 		while (iterInt != _ints.end()) {
-			jsonTxt += setString(iterInt->first) + ":" + setInt(iterInt->second) + ",";
+			if (jsonTxt != "{")
+				jsonTxt += ",";
+			jsonTxt += setString(iterInt->first) + ":" + setInt(iterInt->second);
 			iterInt++;
 		}
 
 		map<string, string>::iterator iterString;
 		iterString = _strings.begin();
 		while (iterString != _strings.end()) {
-			jsonTxt += setString(iterString->first) + ":" + setString(iterString->second) + ",";
+			if (jsonTxt != "{")
+				jsonTxt += ",";
+			jsonTxt += setString(iterString->first) + ":" + setString(iterString->second);
 			iterString++;
 		}
 
 		map<string, float>::iterator iterFloat;
 		iterFloat = _floats.begin();
 		while (iterFloat != _floats.end()) {
-			jsonTxt += setString(iterFloat->first) + ":" + setFloat(iterFloat->second) + ",";
+			if (jsonTxt != "{")
+				jsonTxt += ",";
+			jsonTxt += setString(iterFloat->first) + ":" + setFloat(iterFloat->second);
 			iterFloat++;
 		}
 
 		map<string, bool>::iterator iterBool;
 		iterBool = _bools.begin();
 		while (iterBool != _bools.end()) {
-			jsonTxt += setString(iterBool->first) + ":" + setBool(iterBool->second) + ",";
+			if (jsonTxt != "{")
+				jsonTxt += ",";
+			jsonTxt += setString(iterBool->first) + ":" + setBool(iterBool->second);
 			iterBool++;
 		}
 		
 		jsonTxt += "}";
 
-		return jsonTxt.c_str();
+		return jsonTxt;
 	}
 private:
 	string setString(string str){
