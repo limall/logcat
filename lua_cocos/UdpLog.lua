@@ -35,7 +35,7 @@ end
 -------------------------------------------------------------------------
 -- @description 输出等级为information的日志
 -- @param msg 信息主体
--- @param tag 标记
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
 function logi(msg,tag)
     log(UDPLOG_LEVEL_I,msg,tag)
@@ -44,7 +44,7 @@ end
 -------------------------------------------------------------------------
 -- @description 输出等级为debug的日志
 -- @param msg 信息主体
--- @param tag 标记
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
 function logd(msg,tag)
     log(UDPLOG_LEVEL_D,msg,tag)
@@ -53,7 +53,7 @@ end
 -------------------------------------------------------------------------
 -- @description 输出等级为warning的日志
 -- @param msg 信息主体
--- @param tag 标记
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
 function logw(msg,tag)
     log(UDPLOG_LEVEL_W,msg,tag)
@@ -62,19 +62,13 @@ end
 -------------------------------------------------------------------------
 -- @description 输出等级为error的日志
 -- @param msg 信息主体
--- @param tag 标记
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
 function loge(msg,tag)
     log(UDPLOG_LEVEL_E,msg,tag)
 end
 
--------------------------------------------------------------------------
--- @description 打印table
--- @param level 等级
--- @param table 信息主体
--- @param tag 标记
--------------------------------------------------------------------------
-function logTable(level,table,tag)
+local function stringifyTable(table)
     local msg="{<br/>"
     for k,v in pairs(table)do
         if(type(v)=="string")then
@@ -83,16 +77,30 @@ function logTable(level,table,tag)
         msg=msg .. "&nbsp" .. k .. "&nbsp" .. ":" .. "&nbsp" .. v .. "&nbsp" .. ",<br/>"
     end
     msg=msg .. "}"
+    return msg
+end
+
+-------------------------------------------------------------------------
+-- @description 打印table
+-- @param table 信息主体
+-- @param [level 日志等级
+-- @param [tag 日志标记
+-------------------------------------------------------------------------
+function logTable(table,level,tag)
+    local msg=stringifyTable(table)
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
     log(level,msg,tag)
 end
 
 -------------------------------------------------------------------------
 -- @description 打印数组
--- @param level 等级
 -- @param array 信息主体
--- @param tag 标记
+-- @param [level 日志等级
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
-function logArray(level,array,tag)
+function logArray(array,level,tag)
     local msg="["
     local dot=""
     for k,v in ipairs(array)do
@@ -111,11 +119,11 @@ end
 
 -------------------------------------------------------------------------
 -- @description 打印16进制
--- @param level 等级
 -- @param bytes 信息主体
--- @param tag 标记
+-- @param [level 日志等级
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
-function log0x(level,bytes,tag)
+function log0x(bytes,level,tag)
     local msg;
     if(type(bytes)=="table") then
         msg="["
@@ -137,11 +145,11 @@ end
 
 -------------------------------------------------------------------------
 -- @description 打印Vec2
--- @param level 等级
 -- @param vec2 信息主体
--- @param tag 标记
+-- @param [level 日志等级
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
-function logVec2(level,vec2,tag)
+function logVec2(vec2,level,tag)
     local msg="(" .. vec2.x .. "," .. vec2.y .. ")";
     if(not level)then
         level=UDPLOG_LEVEL_I
@@ -151,8 +159,8 @@ end
 
 -------------------------------------------------------------------------
 -- @description 打印调用栈
--- @param level 等级
--- @param tag 标记
+-- @param [level 日志等级
+-- @param [tag 日志标记
 -------------------------------------------------------------------------
 function logTrace(level,tag)
     local info =debug.traceback()
@@ -194,6 +202,61 @@ function logTrace(level,tag)
     end
     log(level,msg,tag)
     log(UDPLOG_LEVEL_D,'stack traceback:',tag)
+end
+
+-------------------------------------------------------------------------
+-- @description 打印节点
+-- @param node 节点
+-- @param [level 日志等级
+-- @param [tag 日志标记
+-------------------------------------------------------------------------
+function logNode(node,level,tag)
+    local msg=''
+    msg=msg .. 'x:' .. node:getPositionX() .. '<br/>'
+    msg=msg .. 'y:' .. node:getPositionY() .. '<br/>'
+    msg=msg .. 'scaleX:' .. node:getScaleX() .. '<br/>'
+    msg=msg .. 'scaleY:' .. node:getScaleY() .. '<br/>'
+    msg=msg .. 'rotation:' .. node:getRotation() .. '<br/>'
+    msg=msg .. 'opacity:' .. node:getOpacity() .. '<br/>'
+    msg=msg .. 'width:' .. node:getContentSize().width .. '<br/>'
+    msg=msg .. 'width:' .. node:getContentSize().height .. '<br/>'
+    msg=msg .. 'anchorX:' .. node:getAnchorPoint().x .. '<br/>'
+    msg=msg .. 'anchorY:' .. node:getAnchorPoint().y .. '<br/>'
+    msg=msg .. 'visible:' .. tostring(node:isVisible()) .. '<br/>'
+    msg=msg .. 'zOrder:' .. node:getLocalZOrder() .. '<br/>'
+    local color=node:getColor()
+    msg=msg .. 'color:' .. color.r .. ',' .. color.g ..',' .. color.b .. '<br/>'
+    local parentName='nil'
+    local parent=node:getParent()
+    if(parent)then
+        parentName=parent:getName()
+    end
+    if((not parentName) or parentName=='')then
+        parentName='@anonymous'
+    end
+    msg=msg .. 'parent:' .. parentName ..  '<br/>'
+
+    local children=node:getChildren()
+    local childrenMsg=''
+    for k,v in pairs(children)do
+        local name=v:getName()
+        if((not name) or name=='')then
+            name='@anonymous'
+        end
+        childrenMsg=childrenMsg .. name .. ','
+    end
+    msg=msg .. 'children:[' .. childrenMsg .. ']'
+
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
+    log(level,msg,tag)
+
+    local name=node:getName()
+    if((not name) or name=='')then
+        name='@anonymous'
+    end
+    log(UDPLOG_LEVEL_D,'node ' .. name .. ':',tag)
 end
 
 
