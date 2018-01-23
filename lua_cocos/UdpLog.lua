@@ -103,6 +103,9 @@ function logArray(level,array,tag)
         dot=","
     end
     msg=msg .. "&nbsp]"
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
     log(level,msg,tag)
 end
 
@@ -126,7 +129,71 @@ function log0x(level,bytes,tag)
     else
         msg=string.format("%x",bytes)
     end
-        log(level,msg,tag)
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
+    log(level,msg,tag)
+end
+
+-------------------------------------------------------------------------
+-- @description 打印Vec2
+-- @param level 等级
+-- @param vec2 信息主体
+-- @param tag 标记
+-------------------------------------------------------------------------
+function logVec2(level,vec2,tag)
+    local msg="(" .. vec2.x .. "," .. vec2.y .. ")";
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
+    log(level,msg,tag)
+end
+
+-------------------------------------------------------------------------
+-- @description 打印调用栈
+-- @param level 等级
+-- @param tag 标记
+-------------------------------------------------------------------------
+function logTrace(level,tag)
+    local info =debug.traceback()
+    local start=string.find(info,'string "')
+    start=start+9
+    local endIndex=string.find(info,'\n',start)
+    local i=0
+    local msg=''
+    while(start and endIndex)do
+        if(i~=0)then
+            local str=string.sub(info,start+1,endIndex-2)
+            str=string.gsub(str,'"','')
+            str=string.gsub(str,"'",'')
+            str=string.gsub(str,"]",'')
+            str=string.gsub(str,"\\",'')
+            local sep=string.find(str,'in function')
+            local str1=string.sub(str,0,sep-3)
+            local str2=string.sub(str,sep+12)
+            local paragraph=str2 .. '&nbsp<---' .. str1 .. '<br/>'
+            msg=msg .. paragraph
+        end
+
+        i=i+1
+        start=string.find(info,'string "',endIndex)
+        if(start)then
+            start=start+9
+            endIndex=string.find(info,'\n',start)
+            if(not endIndex)then
+                endIndex=string.find(info,'>',start)
+                if(endIndex)then
+                    endIndex=endIndex+2
+                end
+            end
+        end
+    end
+
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
+    log(level,msg,tag)
+    log(UDPLOG_LEVEL_D,'stack traceback:',tag)
 end
 
 
