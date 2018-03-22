@@ -73,6 +73,16 @@ local function stringifyTable(table)
     for k,v in pairs(table)do
         if(type(v)=="string")then
             v='@' .. v
+        elseif(type(v)=="table")then
+            v='{table}'
+        elseif(type(v)=="userdata")then
+            v="{userdata}"
+        elseif(type(v)=="boolean")then
+            if(v)then
+                v="true"
+            else
+                v="false"
+            end
         end
         msg=msg .. "&nbsp" .. k .. "&nbsp" .. ":" .. "&nbsp" .. v .. "&nbsp" .. ",<br/>"
     end
@@ -205,8 +215,18 @@ function logTrace(level,tag)
 end
 
 -------------------------------------------------------------------------
+-- @description 打印类型
+-- @param [obj 对象
+-- @param [level 日志等级
+-- @param [tag 日志标记
+-------------------------------------------------------------------------
+function logType(obj,level,tag)
+    log(level,tolua.type(obj),tag)
+end
+
+-------------------------------------------------------------------------
 -- @description 打印节点
--- @param node 节点
+-- @param [node 节点
 -- @param [level 日志等级
 -- @param [tag 日志标记
 -------------------------------------------------------------------------

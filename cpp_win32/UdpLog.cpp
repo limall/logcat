@@ -170,6 +170,7 @@ void UdpLog::i(const char *tag, const char *msg){
 		sj._strings["tag"] = buf;
 	}else
 		sj._strings["tag"] = tag;
+
 	sj._ints["time"] = time(NULL);
 	sj._strings["level"] = "i";
 	sj._strings["msg"] = msg;
