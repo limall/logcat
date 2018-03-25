@@ -15,6 +15,6 @@ https://www.jianshu.com/p/ec0cc4cd58c7
 
 适用平台
 -------
-* 打印端的接口使用udp协议，所以只要满足它的传输协议，打印端在linux、mac os、windows上都能用的
-* 客户端的编程接口，即各个平台的传输协议的封装。这里只提供了win32和node.js的版本，win32版本可直接使用到cocos2d的项目中。lua需要使用者自己封装与c++的交互
+* 打印端的接口使用udp协议，所以只要满足它的传输协议，打印端在linux、mac os、windows上都能用的。
+* 客户端的编程接口，即各个平台的传输协议的封装，这里只提供了win32和node.js的版本，win32版本可直接使用到cocos2d的项目中。lua需要使用者自己封装与c++的交互。
 
