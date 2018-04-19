@@ -15,7 +15,7 @@ local log=function(level,msg,tag)
         inited=true
     end
     if not tag then
-        tag=logid
+        tag=logid 
     end
     udplog(level,tag,msg)
 end
@@ -221,7 +221,18 @@ end
 -- @param [tag 日志标记
 -------------------------------------------------------------------------
 function logType(obj,level,tag)
-    log(level,tolua.type(obj),tag)
+    log(UDPLOG_LEVEL_D,tolua.type(obj),tag)
+end
+
+-------------------------------------------------------------------------
+-- @description 打印节点的世界坐标
+-- @param [obj 节点
+-- @param [level 日志等级
+-- @param [tag 日志标记
+-------------------------------------------------------------------------
+function logWorldPos(node,level,tag)
+    local pos = node:getParent():convertToWorldSpace(cc.p(node:getPositionX(),node:getPositionY()));
+    logVec2(pos,level,tag)
 end
 
 -------------------------------------------------------------------------
