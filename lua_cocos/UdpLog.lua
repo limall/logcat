@@ -167,6 +167,17 @@ function logVec2(vec2,level,tag)
     log(level,msg,tag)
 end
 
+function logBool(bool,level,tag)
+    local msg='false'
+    if bool then
+        msg='true'
+    end
+    if(not level)then
+        level=UDPLOG_LEVEL_I
+    end
+    log(level,msg,tag)
+end
+
 -------------------------------------------------------------------------
 -- @description 打印调用栈
 -- @param [level 日志等级
