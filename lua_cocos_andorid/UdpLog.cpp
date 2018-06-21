@@ -2,20 +2,19 @@
 
 using namespace std;
 
-std::mutex * UdpLog::_mt=new std::mutex;
+typedef unsigned char byte;
+
+int INVALID_SOCKET=0;
+
 int UdpLog::_id = 0;
-SOCKET UdpLog::_socket = INVALID_SOCKET;
+int UdpLog::_socket = INVALID_SOCKET;
 struct sockaddr * UdpLog::_sockaddr=NULL;
 int UdpLog::_srvAddrLen = 0;
 int UdpLog::_logId = 0;
 
 int UdpLog::getSingleId(){
-	int toReturn;
-	_mt->lock();
-	toReturn = _id;
 	_id++;
-	_mt->unlock();
-	return toReturn;
+	return _id;
 }
 
 void UdpLog::sendBlock(const char *block, bool isBegin, int id, int totoallength,int order){
@@ -63,19 +62,19 @@ void UdpLog::sendMsg(const char *msg){
 }
 
 void UdpLog::setDst(const char *ip, int port,int logId){
+    struct hostent *server = gethostbyname(ip);
+    if (server == NULL) {
+        return;
+    }
 	if (_sockaddr)
 		delete _sockaddr;
 	sockaddr_in *addrServer = new sockaddr_in;
 	addrServer->sin_family = AF_INET;
-	addrServer->sin_addr.s_addr = inet_addr(ip);
+    bcopy((char *)server->h_addr,
+          (char *)&(*addrServer).sin_addr.s_addr, server->h_length);
 	addrServer->sin_port = htons(port);
 	_srvAddrLen = sizeof(*addrServer);
 	_sockaddr = (struct sockaddr*)addrServer;
-
-	// Initialize Winsock.
-	WSADATA wsaData;
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
 	_logId = logId;
 }
 
@@ -113,38 +112,14 @@ void UdpLog::i(string tag,string msg){
 
     if(tagSize<=0||tagSize>9999)
         return;
-    if(msgSize<=0||tagSize>9999)
+    if(msgSize<=0|| msgSize>9999)
         return;
-    if(timeSize<=0||tagSize>9999)
+    if(timeSize<=0|| timeSize>9999)
         return;
-    if(levelSize<=0||tagSize>9999)
+    if(levelSize<=0|| levelSize>9999)
         return;
 
     msg=getIntStr(timeSize,4)+timestr+getIntStr(tagSize,4)+tag+getIntStr(levelSize,4)+level+getIntStr(msgSize,4)+msg;
-	sendMsg(msg.c_str());
-}
-
-void UdpLog::d(string tag, string msg) {
-	int tagSize = tag.size();
-	int msgSize = msg.size();
-	char timechars[16];
-	int timenum = time(NULL);
-	sprintf(timechars, "%d", timenum);
-	string timestr = timechars;
-	int timeSize = timestr.size();
-	string level = "d";
-	int levelSize = level.size();
-
-	if (tagSize <= 0 || tagSize>9999)
-		return;
-	if (msgSize <= 0 || tagSize>9999)
-		return;
-	if (timeSize <= 0 || tagSize>9999)
-		return;
-	if (levelSize <= 0 || tagSize>9999)
-		return;
-
-	msg = getIntStr(timeSize, 4) + timestr + getIntStr(tagSize, 4) + tag + getIntStr(levelSize, 4) + level + getIntStr(msgSize, 4) + msg;
 	sendMsg(msg.c_str());
 }
 
@@ -161,11 +136,35 @@ void UdpLog::w(string tag, string msg) {
 
 	if (tagSize <= 0 || tagSize>9999)
 		return;
-	if (msgSize <= 0 || tagSize>9999)
+	if (msgSize <= 0 || msgSize>9999)
 		return;
-	if (timeSize <= 0 || tagSize>9999)
+	if (timeSize <= 0 || timeSize>9999)
 		return;
-	if (levelSize <= 0 || tagSize>9999)
+	if (levelSize <= 0 || levelSize>9999)
+		return;
+
+	msg = getIntStr(timeSize, 4) + timestr + getIntStr(tagSize, 4) + tag + getIntStr(levelSize, 4) + level + getIntStr(msgSize, 4) + msg;
+	sendMsg(msg.c_str());
+}
+
+void UdpLog::d(string tag, string msg) {
+	int tagSize = tag.size();
+	int msgSize = msg.size();
+	char timechars[16];
+	int timenum = time(NULL);
+	sprintf(timechars, "%d", timenum);
+	string timestr = timechars;
+	int timeSize = timestr.size();
+	string level = "d";
+	int levelSize = level.size();
+
+	if (tagSize <= 0 || tagSize>9999)
+		return;
+	if (msgSize <= 0 || msgSize>9999)
+		return;
+	if (timeSize <= 0 || timeSize>9999)
+		return;
+	if (levelSize <= 0 || levelSize>9999)
 		return;
 
 	msg = getIntStr(timeSize, 4) + timestr + getIntStr(tagSize, 4) + tag + getIntStr(levelSize, 4) + level + getIntStr(msgSize, 4) + msg;
@@ -185,11 +184,11 @@ void UdpLog::e(string tag,string msg){
 
     if(tagSize<=0||tagSize>9999)
         return;
-    if(msgSize<=0||tagSize>9999)
+    if(msgSize<=0|| msgSize>9999)
         return;
-    if(timeSize<=0||tagSize>9999)
+    if(timeSize<=0|| timeSize>9999)
         return;
-    if(levelSize<=0||tagSize>9999)
+    if(levelSize<=0|| levelSize>9999)
         return;
 
     msg=getIntStr(timeSize,4)+timestr+getIntStr(tagSize,4)+tag+getIntStr(levelSize,4)+level+getIntStr(msgSize,4)+msg;
